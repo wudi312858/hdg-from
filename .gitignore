@@ -1,0 +1,12 @@
+# Emacs
+*~
+\#*\#
+
+# Python
+*.egg-info/*
+*.pyc
+.coverage
+
+# Miscellaneous
+*.log
+.tox
