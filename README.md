@@ -12,7 +12,14 @@ the
 instance, in a text file, you can use `hdg-from`to obtain the
 equivalent HDG file by entering:
 
-	$> hdg-from --swmm my-data.txt 
+	$> hdg-from --format swmm my-data.txt 
+	
+Below are the options that `hdg-from` accepts:
+
+| Options | Description | Default Value |
+|---------|-------------|---------------|
+| -f, --format| The file format of the input file | swmm |
+| -h, --help | Display a the list of options and exit | N/A |
 
 
 ## Installation
