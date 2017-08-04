@@ -29,7 +29,7 @@ class AcceptanceTests(TestCase):
                   "$Waterbody Name: Node 3\n"
                   "$Created by: Unknown\n"
                   "$Start Date: 01/01/2017 12:00\n"
-                  "$End Date: 01/01/2017 12:00\n"
+                  "$End Date: 01/01/2017 12:45\n"
                   "$Number of Data Lines: 3\n"
                   "$X, Y, Station Height, Missing value,Profile Format, ExceFormat, Longitude, Latitude, Anemometer Height\n"
                   "$Number of bins, Depth data type, TVD file type\n"

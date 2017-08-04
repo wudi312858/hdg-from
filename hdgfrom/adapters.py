@@ -108,12 +108,14 @@ class Writer(Processor):
 
 class HDGWriter(Writer):
 
+    DATE_FORMAT = "%d/%m/%Y %H:%M"
+
     HDG_HEADER = ("$GLLVHTTVDFile, V5.0\n"
                   "$Creation Date: 03/31/2016 00:00\n"
                   "$Waterbody Name: {water_body}\n"
                   "$Created by: Unknown\n"
-                  "$Start Date: 01/01/2017 12:00\n"
-                  "$End Date: 01/01/2017 12:00\n"
+                  "$Start Date: {start_date}\n"
+                  "$End Date: {end_date}\n"
                   "$Number of Data Lines: {observation_count}\n"
                   "$X, Y, Station Height, Missing value,Profile Format, ExceFormat, Longitude, Latitude, Anemometer Height\n"
                   "$Number of bins, Depth data type, TVD file type\n"
@@ -129,21 +131,20 @@ class HDGWriter(Writer):
     def write_to(self, flow, output_stream):
         header = self.HDG_HEADER.format(
             water_body=flow.water_body,
-            observation_count=len(flow.observations))
+            observation_count=len(flow.observations),
+            start_date=flow.start_date.strftime(self.DATE_FORMAT),
+            end_date=flow.end_date.strftime(self.DATE_FORMAT)
+        )
         output_stream.write(header)
-        start = datetime(year=2017,
-                         month=1,
-                         day=1,
-                         hour=12)
         for each_observation in flow.observations:
-            date = start + each_observation.time
+            date = flow.start_date + each_observation.time
             line = "%d,%d,%d,%d,%d,%d,%.2f\n" % (date.year,
-                                                   date.month,
-                                                   date.day,
-                                               date.hour,
-                                               date.minute,
-                                               date.second,
-                                               each_observation.rate.value)
+                                                 date.month,
+                                                 date.day,
+                                                 date.hour,
+                                                 date.minute,
+                                                 date.second,
+                                                 each_observation.rate.value)
             output_stream.write(line)
 
 class AdapterLibrary:

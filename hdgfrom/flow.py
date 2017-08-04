@@ -9,6 +9,9 @@
 #
 
 
+from datetime import datetime
+
+
 class Rate:
 
     ERROR_INVALID_RATE = "Rate cannot be negative, but found (value={})"
@@ -44,9 +47,10 @@ class Flow:
 
     DEFAULT_WATER_BODY = "Unknown"
 
-    def __init__(self, water_body=None, observations=[]):
+    def __init__(self, water_body=None, observations=[], start_date=None):
         self._water_body = water_body or self.DEFAULT_WATER_BODY
         self._observations = observations
+        self._start_date = start_date or datetime(2017, 1, 1, 12)
 
     @property
     def water_body(self):
@@ -58,3 +62,15 @@ class Flow:
 
     def rate_at(self, time):
         return None
+
+    @property
+    def start_date(self):
+        return self._start_date
+
+    @start_date.setter
+    def start_date(self, new_date):
+        self._start_date = new_date
+
+    @property
+    def end_date(self):
+        return self._start_date + self._observations[-1].time

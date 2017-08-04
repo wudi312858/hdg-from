@@ -19,6 +19,7 @@ Below are the options that `hdg-from` accepts:
 | Options | Description | Default Value |
 |---------|-------------|---------------|
 | -f, --format| The file format of the input file | swmm |
+| -sd, --start-date|Start date used to convert timestamp (i.e., YYYY-MM-DDThh:mm:ss"| 2017-01-01T12:00:00|
 | -h, --help | Display a the list of options and exit | N/A |
 
 
