@@ -17,34 +17,30 @@ from hdgfrom.adapters import AdapterLibrary
 
 
 class AcceptanceTests(TestCase):
-    SWMM_OUTPUT = """
-    Table - Node 3
-                                Total Inflow    
-    Days      	Hours    	(LPS)           
-    0         	00:15:00  	0.18            
-    0         	00:30:00  	2.30            
-    0         	00:45:00  	2.06            
-    """
+    SWMM_OUTPUT = ("Table - Node 3\n"
+                   "                            Total Inflow\n"
+                   "Days      	Hours    	(LPS)\n"
+                   "0         	00:15:00  	0.18\n"
+                   "0         	00:30:00  	2.30\n"
+                   "0         	00:45:00  	2.06\n")
 
-    HDG_OUTPUT = """
-    $GLLVHTTVDFile, V5.0
-    $Creation Date: 03/31/2016 00:00
-    $Waterbody Name: Unknown
-    $Created by: Unknown
-    $Start Date: 01/01/2017 12:00
-    $End Date: 01/01/2017 12:00
-    $Number of Data Lines: 3
-    $X, Y, Station Height, Missing value,Profile Format, ExceFormat, Longitude, Latitude, Anemometer Height
-    $Number of bins, Depth data type, TVD file type
-    62000,6957300,0,999999999,0,0,0,0,0
-    1,0,0
-    1
-    2,0,0,1.0,0,0.0,0.0,Flow Rate,Flow Rate
-    $Year,Month,Day,Hour,Minute,Bin1,Flow Rate
-    2017,1,1,0,15,0,0.18
-    2017,1,1,0,30,0,2.30
-    2017,1,1,0,45,0,2.06
-    """
+    HDG_OUTPUT = ("$GLLVHTTVDFile, V5.0\n"
+                  "$Creation Date: 03/31/2016 00:00\n"
+                  "$Waterbody Name: Node 3\n"
+                  "$Created by: Unknown\n"
+                  "$Start Date: 01/01/2017 12:00\n"
+                  "$End Date: 01/01/2017 12:00\n"
+                  "$Number of Data Lines: 3\n"
+                  "$X, Y, Station Height, Missing value,Profile Format, ExceFormat, Longitude, Latitude, Anemometer Height\n"
+                  "$Number of bins, Depth data type, TVD file type\n"
+                  "62000,6957300,0,999999999,0,0,0,0,0\n"
+                  "1,0,0\n"
+                  "1\n"
+                  "2,0,0,1.0,0,0.0,0.0,Flow Rate,Flow Rate\n"
+                  "$Year,Month,Day,Hour,Minute,Bin1,Flow Rate\n"
+                  "2017,1,1,12,15,0,0.18\n"
+                  "2017,1,1,12,30,0,2.30\n"
+                  "2017,1,1,12,45,0,2.06\n")
 
     SWMM_FILE = "my_swmm_file.txt"
 
@@ -75,4 +71,6 @@ class AcceptanceTests(TestCase):
     def _verify_generated_file(self):
         path = Path(self._generated_file)
         self.assertTrue(path.exists())
-        self.assertEqual(self.HDG_OUTPUT, path.read_text())
+        generated_text = path.read_text()
+        #print(self.HDG_OUTPUT, "\n\n", generated_text)
+        self.assertEqual(self.HDG_OUTPUT, generated_text)

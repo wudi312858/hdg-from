@@ -25,16 +25,36 @@ class Rate:
         return self._value
 
 
+class Observation:
+
+    def __init__(self, rate, time):
+        self._rate = rate
+        self._time = time
+
+    @property
+    def rate(self):
+        return self._rate
+
+    @property
+    def time(self):
+        return self._time
+
+
 class Flow:
 
     DEFAULT_WATER_BODY = "Unknown"
 
-    def __init__(self, water_body=None):
+    def __init__(self, water_body=None, observations=[]):
         self._water_body = water_body or self.DEFAULT_WATER_BODY
+        self._observations = observations
 
     @property
     def water_body(self):
         return self._water_body
+
+    @property
+    def observations(self):
+        return self._observations
 
     def rate_at(self, time):
         return None

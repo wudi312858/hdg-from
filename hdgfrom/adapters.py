@@ -8,6 +8,10 @@
 # of the MIT license.  See the LICENSE file for details.
 #
 
+from hdgfrom.flow import Flow, Observation, Rate
+
+from datetime import datetime, timedelta
+
 
 class FileFormats:
     SWMM = "SWMM"
@@ -58,7 +62,39 @@ class SWMMReader(Reader):
         super().__init__(FileFormats.SWMM)
 
     def read_from(self, input_stream):
-        return None
+        water_body = self._read_water_body_from(input_stream)
+        observations = self._read_observations_from(input_stream)
+        return Flow(water_body.strip(), observations)
+
+    @staticmethod
+    def _read_water_body_from(input_stream):
+        line = ""
+        while not line.strip():
+            line = input_stream.readline()
+        _, water_body = line.split("-")
+        return water_body
+
+    @staticmethod
+    def _read_observations_from(input_stream):
+        observations = []
+        SWMMReader._skip_lines(input_stream, 2)
+        line = input_stream.readline()
+        while line.strip() != "":
+            (day, time, rate) = line.strip().split("\t")
+            (hour, minute, second) = time.strip().split(":")
+            timestamp = timedelta(
+                days=int(day),
+                hours=int(hour),
+                minutes=int(minute),
+                seconds=int(second))
+            observations.append(Observation(Rate(float(rate.strip())), timestamp))
+            line = input_stream.readline()
+        return observations
+
+    @staticmethod
+    def _skip_lines(input_stream, count=1):
+        for i in range(count):
+            input_stream.readline()
 
 
 class Writer(Processor):
@@ -72,32 +108,43 @@ class Writer(Processor):
 
 class HDGWriter(Writer):
 
-    HDG_OUTPUT = """
-    $GLLVHTTVDFile, V5.0
-    $Creation Date: 03/31/2016 00:00
-    $Waterbody Name: Unknown
-    $Created by: Unknown
-    $Start Date: 01/01/2017 12:00
-    $End Date: 01/01/2017 12:00
-    $Number of Data Lines: 3
-    $X, Y, Station Height, Missing value,Profile Format, ExceFormat, Longitude, Latitude, Anemometer Height
-    $Number of bins, Depth data type, TVD file type
-    62000,6957300,0,999999999,0,0,0,0,0
-    1,0,0
-    1
-    2,0,0,1.0,0,0.0,0.0,Flow Rate,Flow Rate
-    $Year,Month,Day,Hour,Minute,Bin1,Flow Rate
-    2017,1,1,0,15,0,0.18
-    2017,1,1,0,30,0,2.30
-    2017,1,1,0,45,0,2.06
-    """
+    HDG_HEADER = ("$GLLVHTTVDFile, V5.0\n"
+                  "$Creation Date: 03/31/2016 00:00\n"
+                  "$Waterbody Name: {water_body}\n"
+                  "$Created by: Unknown\n"
+                  "$Start Date: 01/01/2017 12:00\n"
+                  "$End Date: 01/01/2017 12:00\n"
+                  "$Number of Data Lines: {observation_count}\n"
+                  "$X, Y, Station Height, Missing value,Profile Format, ExceFormat, Longitude, Latitude, Anemometer Height\n"
+                  "$Number of bins, Depth data type, TVD file type\n"
+                  "62000,6957300,0,999999999,0,0,0,0,0\n"
+                  "1,0,0\n"
+                  "1\n"
+                  "2,0,0,1.0,0,0.0,0.0,Flow Rate,Flow Rate\n"
+                  "$Year,Month,Day,Hour,Minute,Bin1,Flow Rate\n")
 
     def __init__(self):
         super().__init__(FileFormats.HDG)
 
     def write_to(self, flow, output_stream):
-        output_stream.write(self.HDG_OUTPUT)
-
+        header = self.HDG_HEADER.format(
+            water_body=flow.water_body,
+            observation_count=len(flow.observations))
+        output_stream.write(header)
+        start = datetime(year=2017,
+                         month=1,
+                         day=1,
+                         hour=12)
+        for each_observation in flow.observations:
+            date = start + each_observation.time
+            line = "%d,%d,%d,%d,%d,%d,%.2f\n" % (date.year,
+                                                   date.month,
+                                                   date.day,
+                                               date.hour,
+                                               date.minute,
+                                               date.second,
+                                               each_observation.rate.value)
+            output_stream.write(line)
 
 class AdapterLibrary:
     """
