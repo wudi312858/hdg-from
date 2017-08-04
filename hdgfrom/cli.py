@@ -88,5 +88,5 @@ def main():
     """
     from sys import argv
 
-    CLI().run(argv)
+    CLI().run(argv[1:])
 
