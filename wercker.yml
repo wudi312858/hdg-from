@@ -1,0 +1,21 @@
+
+box: python:3.6
+
+build:
+  steps:
+    - virtualenv:
+        name: Setup virtual environment
+        install_wheel: false
+
+    - pip-install:
+        name: Install Python packages
+        packages_list: "codecov"
+
+    - script:
+        name: Test & Upload code coverage
+        code: |
+           pip install -e .        # Install hdg-from locally
+           coverage run setup.py test
+           codecov
+           cat acceptance.log
+
