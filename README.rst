@@ -1,7 +1,7 @@
 hdg-from |---| Generate HDG files for GEMSS
 ===============================================
 
-`hdg-from` is a simple command-line tools that generates HDG file for
+"hdg-from" is a simple command-line tool that generates HDG files for
 the Global Environment Modelling System for Subsurface waters
 (GEMSS_).
 
@@ -9,7 +9,7 @@ Example
 -------
 
 For instance, if you have data produced by the Storm Water
-Management Model (SWMM_), say in a text file in for instance), you can
+Management Model (SWMM_), say in a text file in for instance, you can
 use `hdg-from` to obtain the equivalent HDG file by entering.
 
 .. code-block:: console
