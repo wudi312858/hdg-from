@@ -1,6 +1,8 @@
 hdg-from |---| Generate HDG files for GEMSS
 ===============================================
 
+.. image:: https://img.shields.io/pypi/v/hdgfrom.svg
+
 "hdg-from" is a simple command-line tool that generates HDG files for
 the Global Environment Modelling System for Subsurface waters
 (GEMSS_).
@@ -59,11 +61,11 @@ Change Log
 Next Steps
 ----------
 
- * Notify the user of success and of the file being generated.
+ - Notify the user of success and of the file being generated.
 
- * Allow overriding the name of the water body
+ - Allow overriding the name of the water body
 
- * Catch exceptions and display appropiate messages to the user
+ - Catch exceptions and display appropiate messages to the user
 
 .. |---| unicode:: U+2014
 

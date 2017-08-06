@@ -16,9 +16,15 @@ from setuptools import setup
 from hdgfrom import __VERSION__
 
 
+def readme():
+    with open("README.rst") as readme_file:
+        return readme_file.read()
+
+
 setup(name="hdgfrom",
       version=__VERSION__,
       description="Generate HDG files for GEMSS",
+      long_description=readme(),
       author="Di Wu",
       author_email="di.wu@ntnu.no",
       url="https://github.com/wudi312858/hdg-from",
