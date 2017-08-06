@@ -1,5 +1,5 @@
 #
-# HDG_from -- Generate HDG files for GEMSS
+# hdg-from -- Generate HDG files for GEMSS
 #
 # Copyright (C) 2017 Di WU
 # All rights reserved.
@@ -8,4 +8,4 @@
 # of the MIT license.  See the LICENSE file for details.
 #
 
-__VERSION__ = "0.0.1"
+__VERSION__ = "0.1.0"
