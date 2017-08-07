@@ -8,10 +8,13 @@
 # of the MIT license.  See the LICENSE file for details.
 #
 
+# Compatibility with Pyhton 2.7
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 from unittest import TestCase
-from pathlib import Path
 from io import StringIO
+from os import remove
+from os.path import isfile
 
 from hdgfrom.cli import CLI, Display
 from hdgfrom.adapters import AdapterLibrary
@@ -87,8 +90,7 @@ class AcceptanceTests(TestCase):
             output_file.write(content)
 
     def _delete_file(self, file_name):
-        path = Path(file_name)
-        path.unlink()
+        remove(file_name)
 
     def _verify_output_contains(self, text, **arguments):
         output = self._output.getvalue()
@@ -96,8 +98,6 @@ class AcceptanceTests(TestCase):
         self.assertTrue(expected_text in output, msg=output)
 
     def _verify_generated_file(self):
-        path = Path(self._generated_file)
-        self.assertTrue(path.exists())
-        generated_text = path.read_text()
-        #print(self.HDG_OUTPUT, "\n\n", generated_text)
-        self.assertEqual(self.HDG_OUTPUT, generated_text)
+        self.assertTrue(isfile(self._generated_file))
+        with open(self._generated_file, "r") as generated_file:
+            self.assertEqual(self.HDG_OUTPUT, generated_file.read())

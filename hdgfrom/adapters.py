@@ -8,6 +8,12 @@
 # of the MIT license.  See the LICENSE file for details.
 #
 
+# Compatibility with Pyhton 2.7
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
+from builtins import str, open, super, int, range
+__metaclass__ = type
+
 from hdgfrom.flow import Flow, Observation, Rate
 
 from datetime import datetime, timedelta

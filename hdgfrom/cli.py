@@ -8,7 +8,9 @@
 # of the MIT license.  See the LICENSE file for details.
 #
 
-from pathlib import Path
+# Compatibility with Pyhton 2.7
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from argparse import ArgumentParser
 from datetime import datetime
 from sys import argv, stdout
@@ -32,6 +34,7 @@ class Arguments:
             start_date=arguments.start_date
         )
 
+    @staticmethod
     def _prepare_parser():
         parser = ArgumentParser(
             "hdg-from",
@@ -147,7 +150,7 @@ class CLI:
             self._write_flow_to(flow, FileFormats.HDG, arguments.output_file)
             self._display.conversion_complete(arguments)
 
-        except FileNotFoundError as e:
+        except IOError as e:
             self._display.input_file_not_found(arguments, e)
 
     def _read_flow_from(self, file_format, path):
