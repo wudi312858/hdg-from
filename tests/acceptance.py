@@ -79,6 +79,14 @@ class AcceptanceTests(TestCase):
             Display.CONVERSION_COMPLETE,
             file=self._generated_file)
 
+    def test_invalid_start_date(self):
+        date = "this-is-not-a-valid-date!"
+        self._cli.run(["--start-date", date, self.SWMM_FILE])
+
+        self._verify_output_contains(
+            Display.ERROR_INVALID_DATE,
+            date=date)
+
     def test_converting_a_file_that_does_not_exist(self):
         file_name = "does-not-exist.txt"
 

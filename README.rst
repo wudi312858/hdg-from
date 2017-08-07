@@ -61,7 +61,8 @@ Change Log
  - Tell the user how many observations were loaded from the input
    file.
  - Catch `FileNotFoundError` properly.
- - Generate the correct creation date
+ - Catch invalid start dates properly.
+ - Generate the correct creation date.
  - Compatibility with Python 2.7 and Python 3.3+.
 
 :Version 0.1.0:
@@ -76,6 +77,7 @@ Next Steps
 
 - Allow overriding the name of the water body
 - Let the user specify its user name
+- Reports invalid dates
 
 .. |---| unicode:: U+2014
 

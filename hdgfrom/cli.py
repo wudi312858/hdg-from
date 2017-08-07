@@ -17,6 +17,7 @@ from sys import argv, stdout
 
 from hdgfrom.flow import Flow
 from hdgfrom.adapters import FileFormats, AdapterLibrary
+from hdgfrom.errors import InvalidDateError
 
 
 class Arguments:
@@ -61,15 +62,12 @@ class Arguments:
 
     DATE_FORMAT = "%Y-%m-%dT%H:%M:%S"
 
-    ERROR_INVALID_DATE = ("Invalid date '{text}'.\n"
-                          "Use ISO8601 format (e.g., 1982-05-05T12:050:34)")
-
     @staticmethod
     def _validate(text):
         try:
             return datetime.strptime(text, Arguments.DATE_FORMAT)
         except ValueError:
-            message = ERROR_INVALID_DATE.format(text=text)
+            raise InvalidDateError(text)
 
     @property
     def input_file(self):
@@ -102,26 +100,35 @@ class Display:
     )
 
     ERROR_INPUT_FILE_NOT_FOUND = (
-        "Error: Unable to open the input file '{file}'.\n"
+        "ERROR: Unable to open the input file '{file}'.\n"
         "       {hint}\n"
+    )
+
+    ERROR_INVALID_DATE = (
+        "ERROR: The value '{date}' is not a valid ISO 8601 date.\n"
+        "       ISO 8601 format is YYYY-MM-DDThh:mm:ss.\n"
     )
 
     def __init__(self, output):
         self._output = output or stdout
 
-    def input_file_loaded(self, arguments, flow):
+    def input_file_loaded(self, path, flow):
         self._display(self.INPUT_FILE_LOADED,
-                      file=arguments.input_file,
+                      file=path,
                       count=len(flow.observations))
 
-    def conversion_complete(self, arguments):
+    def conversion_complete(self, path):
         self._display(self.CONVERSION_COMPLETE,
-                      file=arguments.output_file)
+                      file=path)
 
-    def input_file_not_found(self, arguments, error):
+    def error_input_file_not_found(self, arguments, error):
         self._display(self.ERROR_INPUT_FILE_NOT_FOUND,
                       file=arguments.input_file,
                       hint=error.strerror)
+
+    def error_invalid_date(self, date):
+        self._display(self.ERROR_INVALID_DATE,
+                      date=date)
 
     def _display(self, message, **arguments):
         text = message.format(**arguments)
@@ -141,25 +148,26 @@ class CLI:
     def run(self, command_line):
         try:
             arguments = Arguments.read_from(command_line)
-
             flow = self._read_flow_from(arguments.input_format, arguments.input_file)
-            self._display.input_file_loaded(arguments, flow)
-
             flow.start_date = arguments.start_date
-
             self._write_flow_to(flow, FileFormats.HDG, arguments.output_file)
-            self._display.conversion_complete(arguments)
+
+        except InvalidDateError as error:
+            self._display.error_invalid_date(error.date)
 
         except IOError as e:
-            self._display.input_file_not_found(arguments, e)
+            self._display.error_input_file_not_found(arguments, e)
 
     def _read_flow_from(self, file_format, path):
         with open(path, "r") as input_file:
-            return self._adapters.read_from(file_format, input_file)
+            flow = self._adapters.read_from(file_format, input_file)
+            self._display.input_file_loaded(path, flow)
+            return flow
 
     def _write_flow_to(self, flow, format, path):
         with open(path, "w") as output:
             self._adapters.write_to(flow, format, output)
+            self._display.conversion_complete(path)
 
 
 def main():

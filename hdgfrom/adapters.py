@@ -14,9 +14,11 @@ from __future__ import (absolute_import, division, print_function,
 from builtins import str, open, super, int, range
 __metaclass__ = type
 
+from datetime import datetime, timedelta
+
 from hdgfrom.flow import Flow, Observation, Rate
 
-from datetime import datetime, timedelta
+
 
 
 class FileFormats:
