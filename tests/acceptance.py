@@ -12,12 +12,19 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from unittest import TestCase
+from mock import patch
+
 from io import StringIO
 from os import remove
 from os.path import isfile
+from datetime import datetime
 
 from hdgfrom.cli import CLI, Display
 from hdgfrom.adapters import AdapterLibrary
+
+
+def fake_now():
+    return datetime(2017, 1, 1, 12)
 
 
 class AcceptanceTests(TestCase):
@@ -29,7 +36,7 @@ class AcceptanceTests(TestCase):
                    "0         	00:45:00  	2.06\n")
 
     HDG_OUTPUT = ("$GLLVHTTVDFile, V5.0\n"
-                  "$Creation Date: 03/31/2016 00:00\n"
+                  "$Creation Date: 01/01/2017 12:00\n"
                   "$Waterbody Name: Node 3\n"
                   "$Created by: Unknown\n"
                   "$Start Date: 01/01/2017 12:00\n"
@@ -57,7 +64,8 @@ class AcceptanceTests(TestCase):
         self._delete_file(self.SWMM_FILE)
         self._delete_file(self._generated_file)
 
-    def test_convertion_from_swmm(self):
+    @patch('hdgfrom.adapters.Writer.now', side_effect=fake_now)
+    def test_convertion_from_swmm(self, mock):
         self._cli.run(["--format", "swmm", self.SWMM_FILE])
 
         self._verify_generated_file()

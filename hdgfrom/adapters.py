@@ -111,13 +111,17 @@ class Writer(Processor):
     def write_to(self, flow, output_stream):
         pass
 
+    @staticmethod
+    def now():
+        return datetime.now()
+
 
 class HDGWriter(Writer):
 
     DATE_FORMAT = "%d/%m/%Y %H:%M"
 
     HDG_HEADER = ("$GLLVHTTVDFile, V5.0\n"
-                  "$Creation Date: 03/31/2016 00:00\n"
+                  "$Creation Date: {creation_date}\n"
                   "$Waterbody Name: {water_body}\n"
                   "$Created by: Unknown\n"
                   "$Start Date: {start_date}\n"
@@ -137,9 +141,10 @@ class HDGWriter(Writer):
     def write_to(self, flow, output_stream):
         header = self.HDG_HEADER.format(
             water_body=flow.water_body,
-            observation_count=len(flow.observations),
+            creation_date=self.now().strftime(self.DATE_FORMAT),
             start_date=flow.start_date.strftime(self.DATE_FORMAT),
-            end_date=flow.end_date.strftime(self.DATE_FORMAT)
+            end_date=flow.end_date.strftime(self.DATE_FORMAT),
+            observation_count=len(flow.observations)
         )
         output_stream.write(header)
         for each_observation in flow.observations:

@@ -11,13 +11,18 @@
 # Compatibility with Pyhton 2.7
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from io import StringIO
 from unittest import TestCase
-from datetime import timedelta
+from mock import patch
+
+from io import StringIO
+from datetime import datetime, timedelta
 
 from hdgfrom.flow import Flow, Observation, Rate
 from hdgfrom.adapters import SWMMReader, HDGWriter
 
+
+def fake_now():
+    return datetime(2017, 1, 1, 12)
 
 class SWMMReaderTests(TestCase):
 
@@ -58,7 +63,7 @@ class HDGWriterTest(TestCase):
               Observation(Rate(0.20), timedelta(minutes=30)),
               Observation(Rate(0.30), timedelta(minutes=45)) ])
         self._expected_hdg = ("$GLLVHTTVDFile, V5.0\n"
-                              "$Creation Date: 03/31/2016 00:00\n"
+                              "$Creation Date: 01/01/2017 12:00\n"
                               "$Waterbody Name: Test Water\n"
                               "$Created by: Unknown\n"
                               "$Start Date: 01/01/2017 12:00\n"
@@ -75,7 +80,8 @@ class HDGWriterTest(TestCase):
                               "2017,1,1,12,30,0,0.20\n"
                               "2017,1,1,12,45,0,0.30\n")
 
-    def test_write(self):
+    @patch('hdgfrom.adapters.Writer.now', side_effect=fake_now)
+    def test_write(self, mock):
         self._writer.write_to(self._flow, self._output)
         self.assertEqual(self._expected_hdg, self._output.getvalue())
 
