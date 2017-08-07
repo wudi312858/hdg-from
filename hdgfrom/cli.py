@@ -43,6 +43,7 @@ class Arguments:
             "-f",
             "--format",
             choices=["swmm"],
+            default="swmm",
             help="Format of the input file")
         parser.add_argument(
             "-sd", "--start-date",
@@ -93,6 +94,10 @@ class Display:
         "{count} observation(s) loaded from '{file}'.\n"
     )
 
+    CONVERSION_COMPLETE = (
+        "'{file}' successfully generated.\n"
+    )
+
     ERROR_INPUT_FILE_NOT_FOUND = (
         "Error: Unable to open the input file '{file}'.\n"
         "       {hint}\n"
@@ -105,6 +110,10 @@ class Display:
         self._display(self.INPUT_FILE_LOADED,
                       file=arguments.input_file,
                       count=len(flow.observations))
+
+    def conversion_complete(self, arguments):
+        self._display(self.CONVERSION_COMPLETE,
+                      file=arguments.output_file)
 
     def input_file_not_found(self, arguments, error):
         self._display(self.ERROR_INPUT_FILE_NOT_FOUND,
@@ -136,6 +145,7 @@ class CLI:
             flow.start_date = arguments.start_date
 
             self._write_flow_to(flow, FileFormats.HDG, arguments.output_file)
+            self._display.conversion_complete(arguments)
 
         except FileNotFoundError as e:
             self._display.input_file_not_found(arguments, e)

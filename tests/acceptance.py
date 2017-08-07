@@ -59,20 +59,24 @@ class AcceptanceTests(TestCase):
 
         self._verify_generated_file()
 
-        expected = Display.INPUT_FILE_LOADED.format(
+        self._verify_output_contains(
+            Display.INPUT_FILE_LOADED,
             file=self.SWMM_FILE,
             count=3)
-        self._verify_output_contains(expected)
+
+        self._verify_output_contains(
+            Display.CONVERSION_COMPLETE,
+            file=self._generated_file)
 
     def test_converting_a_file_that_does_not_exist(self):
         file_name = "does-not-exist.txt"
 
         self._cli.run(["--format", "swmm", file_name])
 
-        expected = Display.ERROR_INPUT_FILE_NOT_FOUND.format(
+        self._verify_output_contains(
+            Display.ERROR_INPUT_FILE_NOT_FOUND,
             file=file_name,
             hint="No such file or directory")
-        self._verify_output_contains(expected)
 
     @property
     def _generated_file(self):
@@ -86,9 +90,10 @@ class AcceptanceTests(TestCase):
         path = Path(file_name)
         path.unlink()
 
-    def _verify_output_contains(self, text):
+    def _verify_output_contains(self, text, **arguments):
         output = self._output.getvalue()
-        self.assertTrue(text in output, msg=output)
+        expected_text = text.format(**arguments)
+        self.assertTrue(expected_text in output, msg=output)
 
     def _verify_generated_file(self):
         path = Path(self._generated_file)
