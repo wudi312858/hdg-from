@@ -47,7 +47,7 @@ as follows:
    $ pip install hdgfrom
 
 Alternatively, you may want to install the *latest version under
-development*. To this end, ``pip`` can as well directly from the last
+development*. To this end, ``pip`` you can directly install the last
 commit on the Git repository, using:
 
 .. code-block:: console
