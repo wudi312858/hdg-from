@@ -11,8 +11,9 @@
 
 from unittest import TestCase
 from pathlib import Path
+from io import StringIO
 
-from hdgfrom.cli import CLI
+from hdgfrom.cli import CLI, Display
 from hdgfrom.adapters import AdapterLibrary
 
 
@@ -46,19 +47,36 @@ class AcceptanceTests(TestCase):
 
     def setUp(self):
         self._create_file(self.SWMM_FILE, content=self.SWMM_OUTPUT)
+        self._output = StringIO()
+        self._cli = CLI(output=self._output)
 
     def teardown(self):
         self._delete_file(self.SWMM_FILE)
         self._delete_file(self._generated_file)
 
+    def test_convertion_from_swmm(self):
+        self._cli.run(["--format", "swmm", self.SWMM_FILE])
+
+        self._verify_generated_file()
+
+        expected = Display.INPUT_FILE_LOADED.format(
+            file=self.SWMM_FILE,
+            count=3)
+        self._verify_output_contains(expected)
+
+    def test_converting_a_file_that_does_not_exist(self):
+        file_name = "does-not-exist.txt"
+
+        self._cli.run(["--format", "swmm", file_name])
+
+        expected = Display.ERROR_INPUT_FILE_NOT_FOUND.format(
+            file=file_name,
+            hint="No such file or directory")
+        self._verify_output_contains(expected)
+
     @property
     def _generated_file(self):
         return self.SWMM_FILE.replace(".txt", ".hdg")
-
-    def test_convertion_from_swmm(self):
-        cli = CLI(AdapterLibrary())
-        cli.run(["--format", "swmm", self.SWMM_FILE])
-        self._verify_generated_file()
 
     def _create_file(self, file_name, content):
         with open(file_name, "w+") as output_file:
@@ -67,6 +85,10 @@ class AcceptanceTests(TestCase):
     def _delete_file(self, file_name):
         path = Path(file_name)
         path.unlink()
+
+    def _verify_output_contains(self, text):
+        output = self._output.getvalue()
+        self.assertTrue(text in output, msg=output)
 
     def _verify_generated_file(self):
         path = Path(self._generated_file)

@@ -11,6 +11,7 @@
 from pathlib import Path
 from argparse import ArgumentParser
 from datetime import datetime
+from sys import argv, stdout
 
 from hdgfrom.flow import Flow
 from hdgfrom.adapters import FileFormats, AdapterLibrary
@@ -83,20 +84,61 @@ class Arguments:
         return self._start_date
 
 
+class Display:
+    """
+    Encapsulate printing messages on the console.
+    """
+
+    INPUT_FILE_LOADED = (
+        "{count} observation(s) loaded from '{file}'.\n"
+    )
+
+    ERROR_INPUT_FILE_NOT_FOUND = (
+        "Error: Unable to open the input file '{file}'.\n"
+        "       {hint}\n"
+    )
+
+    def __init__(self, output):
+        self._output = output or stdout
+
+    def input_file_loaded(self, arguments, flow):
+        self._display(self.INPUT_FILE_LOADED,
+                      file=arguments.input_file,
+                      count=len(flow.observations))
+
+    def input_file_not_found(self, arguments, error):
+        self._display(self.ERROR_INPUT_FILE_NOT_FOUND,
+                      file=arguments.input_file,
+                      hint=error.strerror)
+
+    def _display(self, message, **arguments):
+        text = message.format(**arguments)
+        self._output.write(text)
+
+
 class CLI:
     """
     Parse the command line and then read the flow from the input file,
     and write the same flow down as an HDG file.
     """
 
-    def __init__(self, adapters=None):
+    def __init__(self, adapters=None, output=None):
         self._adapters = adapters or AdapterLibrary()
+        self._display = Display(output)
 
     def run(self, command_line):
-        arguments = Arguments.read_from(command_line)
-        flow = self._read_flow_from(arguments.input_format, arguments.input_file)
-        flow.start_date = arguments.start_date
-        self._write_flow_to(flow, FileFormats.HDG, arguments.output_file)
+        try:
+            arguments = Arguments.read_from(command_line)
+
+            flow = self._read_flow_from(arguments.input_format, arguments.input_file)
+            self._display.input_file_loaded(arguments, flow)
+
+            flow.start_date = arguments.start_date
+
+            self._write_flow_to(flow, FileFormats.HDG, arguments.output_file)
+
+        except FileNotFoundError as e:
+            self._display.input_file_not_found(arguments, e)
 
     def _read_flow_from(self, file_format, path):
         with open(path, "r") as input_file:
@@ -111,7 +153,5 @@ def main():
     """
     Entry point of the program
     """
-    from sys import argv
-
     CLI().run(argv[1:])
 
