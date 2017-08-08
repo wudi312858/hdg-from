@@ -20,22 +20,28 @@ use `hdg-from` to obtain the equivalent HDG file by entering.
 
 Below are the options that `hdg-from` accepts:
 
-+---------------+-------------------------------------+---------------------+
-| Options       | Description                         | Default Value       |
-+===============+=====================================+=====================+
-| -f,           |The file format of the input file    | swmm                |
-| --format      |                                     |                     |
-+---------------+-------------------------------------+---------------------+
-| -sd,          |Start date used to convert simulated | 2017-01-01T12:00:00 |
-| --start-date  |time in `ISO 8601`_                  |                     |
-|               |(i.e., YYYY-MM-DDThh:mm:ss)          |                     |
-+---------------+-------------------------------------+---------------------+
-| -u,           | Specify the user that creates the   | "Unknown"           |
-| --user-name   | HDG file                            |                     |
-+---------------+-------------------------------------+---------------------+
-| -h,           |Display a the list of options and    | N/A                 |
-| --help        |exit                                 |                     |
-+---------------+-------------------------------------+---------------------+
+ -f <format>, --format <format>
+
+    The file format of the input file. So far only the SWMM format is
+    available, but other my be supported in later version.
+
+ -sd <date>, --start-date <date>
+
+    The date used as a starting point to convert simulated time into
+    absolute time. Dates must adhere to the `ISO 8601` standard such
+    as 2017-01-01T12:00:00. By default, the date used is Jan. 1, 2017
+    at 12:00 AM.
+
+ -u <name>, --user-name <name>
+
+    The name of the user that creates the HDG file. Should be enclosed
+    in double quotes it contains space. By default, the user name is
+    "Unknown".
+
+ -h, --help
+
+    Show a similar description of the available options and exit.
+
 
 Installation
 ------------
@@ -61,6 +67,7 @@ commit on the Git repository, using:
 Change Log
 ----------
 :Next Version:
+ - Let the user specify its name for inclusion in the HDG file
  - Tell the user how many observations were loaded from the input
    file.
  - Catch `FileNotFoundError` properly.
