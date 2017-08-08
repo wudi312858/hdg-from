@@ -39,14 +39,16 @@ setup(name="hdgfrom",
         ]
       },
       classifiers=[
-          "Development Status :: 2 - Pre-Alpha",
+          "Development Status :: 3 - Alpha",
           "Environment :: Console",
+          "Intended Audience :: Science/Research",
           "License :: OSI Approved :: MIT License",
           "Natural Language :: English",
           "Operating System :: MacOS :: MacOS X",
           "Operating System :: Microsoft :: Windows",
           "Operating System :: POSIX :: Linux",
+          "Programming Language :: Python :: 2.7",
           "Programming Language :: Python :: 3",
-          "Topic :: Scientific/Engineering :: Artificial Intelligence"
+          "Topic :: Scientific/Engineering"
       ]
      )

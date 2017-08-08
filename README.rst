@@ -79,9 +79,10 @@ commit on the Git repository, using:
 
 Change Log
 ----------
-:Next Version:
- - Let the user specify its name for inclusion in the HDG file
- - Let the user override the name of the water body
+:Version 0.2.0:
+ - Let the user specify the name of the generated HDG file.
+ - Let the user specify its name for inclusion in the HDG file.
+ - Let the user override the name of the water body.
  - Tell the user how many observations were loaded from the input
    file.
  - Catch `FileNotFoundError` properly.
