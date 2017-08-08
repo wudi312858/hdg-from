@@ -25,7 +25,7 @@ Below are the options that `hdg-from` accepts:
     The file format of the input file. So far only the SWMM format is
     available, but other my be supported in later version.
 
- -sd <date>, --start-date <date>
+ -s <date>, --start-date <date>
 
     The date used as a starting point to convert simulated time into
     absolute time. Dates must adhere to the `ISO 8601` standard such

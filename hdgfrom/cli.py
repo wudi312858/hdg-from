@@ -51,7 +51,7 @@ class Arguments:
             default="swmm",
             help="Format of the input file")
         parser.add_argument(
-            "-sd", "--start-date",
+            "-s", "--start-date",
             default="2017-1-1T12:00:00",
             help="Start date used to convert timestamp (i.e., YYYY-MM-DDThh:mm:ss")
         parser.add_argument(
