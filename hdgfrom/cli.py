@@ -34,7 +34,8 @@ class Arguments:
             input_format=arguments.format,
             start_date=arguments.start_date,
             user_name=arguments.user_name,
-            water_body=arguments.water_body
+            water_body=arguments.water_body,
+            output_file=arguments.output
         )
 
     @staticmethod
@@ -52,6 +53,9 @@ class Arguments:
             default="swmm",
             help="Format of the input file")
         parser.add_argument(
+            "-o", "--output",
+            help="The HDG file to generate")
+        parser.add_argument(
             "-s", "--start-date",
             default="2017-1-1T12:00:00",
             help="Start date used to convert timestamp (i.e., YYYY-MM-DDThh:mm:ss")
@@ -63,12 +67,14 @@ class Arguments:
             help="The name of the water body")
         return parser
 
-    def __init__(self, input_file, input_format, start_date, user_name, water_body):
+    def __init__(self, input_file, input_format, start_date, user_name,
+                 water_body, output_file):
         self._input_file = input_file
         self._input_format = FileFormats.match(input_format)
         self._start_date = self._validate(start_date)
         self._user_name = user_name
         self._water_body = water_body
+        self._output_file = output_file
 
     DATE_FORMAT = "%Y-%m-%dT%H:%M:%S"
 
@@ -89,7 +95,9 @@ class Arguments:
 
     @property
     def output_file(self):
-        return self._input_file.replace(".txt", ".hdg")
+        if self._output_file is None:
+            return self._input_file.replace(".txt", ".hdg")
+        return self._output_file
 
     @property
     def start_date(self):

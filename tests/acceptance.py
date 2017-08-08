@@ -92,7 +92,7 @@ class AcceptanceTests(TestCase):
             file=self._generated_file)
 
     @patch('hdgfrom.adapters.Writer.now', side_effect=fake_now)
-    def test_setting_wter_body_name(self, mock):
+    def test_setting_water_body_name(self, mock):
         water_body = "Havre de Rotheneuf"
         self._cli.run(["--water-body", water_body, self.SWMM_FILE])
 
@@ -102,6 +102,19 @@ class AcceptanceTests(TestCase):
         self._verify_output_contains(
             Display.CONVERSION_COMPLETE,
             file=self._generated_file)
+
+    @patch('hdgfrom.adapters.Writer.now', side_effect=fake_now)
+    def test_setting_hdg_file_name(self, mock):
+        file_name = "bidon.hdg"
+        self._cli.run(["--output", file_name, self.SWMM_FILE])
+
+        self._verify_generated_file(
+            self.HDG_OUTPUT,
+            file_name)
+
+        self._verify_output_contains(
+            Display.CONVERSION_COMPLETE,
+            file=file_name)
 
     def test_invalid_start_date(self):
         date = "this-is-not-a-valid-date!"
@@ -137,8 +150,9 @@ class AcceptanceTests(TestCase):
         expected_text = text.format(**arguments)
         self.assertTrue(expected_text in output, msg=output)
 
-    def _verify_generated_file(self, expected_content):
-        self.assertTrue(isfile(self._generated_file))
-        with open(self._generated_file, "r") as generated_file:
+    def _verify_generated_file(self, expected_content, path=None):
+        file_path = path or self._generated_file
+        self.assertTrue(isfile(file_path))
+        with open(file_path, "r") as generated_file:
             generated_text = generated_file.read()
             self.assertEqual(expected_content, generated_text, msg=generated_text)

@@ -16,36 +16,42 @@ use `hdg-from` to obtain the equivalent HDG file by entering.
 
 .. code-block:: console
 
-    $ hdg-from --format swmm my-data.txt
+    $ hdg-from my-data.txt
 
 Below are the options that `hdg-from` accepts:
 
- -f <format>, --format <format>
+-f <format>, --format <format>
 
     The file format of the input file. So far only the SWMM format is
     available, but other my be supported in later version.
 
- -s <date>, --start-date <date>
+-o <file>, --output <file>
+
+    The HDG file to generate. By default, the generated file will have
+    the same name as the given input file (only its extension will
+    differ).
+
+-s <date>, --start-date <date>
 
     The date used as a starting point to convert simulated time into
-    absolute time. Dates must adhere to the `ISO 8601` standard such
+    absolute time. Dates must adhere to the `ISO 8601`_ standard such
     as 2017-01-01T12:00:00. By default, the date used is Jan. 1, 2017
     at 12:00 AM.
 
- -u <name>, --user-name <name>
+-u <name>, --user-name <name>
 
     The name of the user that creates the HDG file. Should be enclosed
     in double quotes if it contains space. By default, the user name
     is "Unknown".
 
- -w <name>, --water-body <name>
+-w <name>, --water-body <name>
 
     The name of the water body to set in the HDG file. This will
     override the one read in the SWMM file, if any. Should be enclosed
     in double quotes if it contains spaces. By default, the name of
     the water body is read from the input file.
 
- -h, --help
+-h, --help
 
     Show a similar description of the available options and exit.
 
