@@ -61,11 +61,13 @@ class HDGWriterTest(TestCase):
             "Test Water",
             [ Observation(Rate(0.10), timedelta(minutes=15)),
               Observation(Rate(0.20), timedelta(minutes=30)),
-              Observation(Rate(0.30), timedelta(minutes=45)) ])
+              Observation(Rate(0.30), timedelta(minutes=45)) ],
+            user_name="Bobby"
+        )
         self._expected_hdg = ("$GLLVHTTVDFile, V5.0\n"
                               "$Creation Date: 01/01/2017 12:00\n"
                               "$Waterbody Name: Test Water\n"
-                              "$Created by: Unknown\n"
+                              "$Created by: Bobby\n"
                               "$Start Date: 01/01/2017 12:00\n"
                               "$End Date: 01/01/2017 12:45\n"
                               "$Number of Data Lines: 3\n"

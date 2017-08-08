@@ -68,12 +68,24 @@ class AcceptanceTests(TestCase):
     def test_convertion_from_swmm(self, mock):
         self._cli.run(["--format", "swmm", self.SWMM_FILE])
 
-        self._verify_generated_file()
+        self._verify_generated_file(self.HDG_OUTPUT)
 
         self._verify_output_contains(
             Display.INPUT_FILE_LOADED,
             file=self.SWMM_FILE,
             count=3)
+
+        self._verify_output_contains(
+            Display.CONVERSION_COMPLETE,
+            file=self._generated_file)
+
+    @patch('hdgfrom.adapters.Writer.now', side_effect=fake_now)
+    def test_setting_user_name(self, mock):
+        user_name = "James Brown"
+        self._cli.run(["--user-name", user_name, self.SWMM_FILE])
+
+        self._verify_generated_file(
+            self.HDG_OUTPUT.replace("Unknown", user_name))
 
         self._verify_output_contains(
             Display.CONVERSION_COMPLETE,
@@ -113,7 +125,8 @@ class AcceptanceTests(TestCase):
         expected_text = text.format(**arguments)
         self.assertTrue(expected_text in output, msg=output)
 
-    def _verify_generated_file(self):
+    def _verify_generated_file(self, expected_content):
         self.assertTrue(isfile(self._generated_file))
         with open(self._generated_file, "r") as generated_file:
-            self.assertEqual(self.HDG_OUTPUT, generated_file.read())
+            generated_text = generated_file.read()
+            self.assertEqual(expected_content, generated_text, msg=generated_text)

@@ -19,8 +19,6 @@ from datetime import datetime, timedelta
 from hdgfrom.flow import Flow, Observation, Rate
 
 
-
-
 class FileFormats:
     SWMM = "SWMM"
     HDG = "HDG"
@@ -125,7 +123,7 @@ class HDGWriter(Writer):
     HDG_HEADER = ("$GLLVHTTVDFile, V5.0\n"
                   "$Creation Date: {creation_date}\n"
                   "$Waterbody Name: {water_body}\n"
-                  "$Created by: Unknown\n"
+                  "$Created by: {user_name}\n"
                   "$Start Date: {start_date}\n"
                   "$End Date: {end_date}\n"
                   "$Number of Data Lines: {observation_count}\n"
@@ -142,8 +140,9 @@ class HDGWriter(Writer):
 
     def write_to(self, flow, output_stream):
         header = self.HDG_HEADER.format(
-            water_body=flow.water_body,
             creation_date=self.now().strftime(self.DATE_FORMAT),
+            water_body=flow.water_body,
+            user_name=flow.user_name,
             start_date=flow.start_date.strftime(self.DATE_FORMAT),
             end_date=flow.end_date.strftime(self.DATE_FORMAT),
             observation_count=len(flow.observations)

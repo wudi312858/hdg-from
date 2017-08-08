@@ -30,6 +30,9 @@ Below are the options that `hdg-from` accepts:
 | --start-date  |time in `ISO 8601`_                  |                     |
 |               |(i.e., YYYY-MM-DDThh:mm:ss)          |                     |
 +---------------+-------------------------------------+---------------------+
+| -u,           | Specify the user that creates the   | "Unknown"           |
+| --user-name   | HDG file                            |                     |
++---------------+-------------------------------------+---------------------+
 | -h,           |Display a the list of options and    | N/A                 |
 | --help        |exit                                 |                     |
 +---------------+-------------------------------------+---------------------+

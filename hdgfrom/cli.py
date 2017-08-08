@@ -32,7 +32,8 @@ class Arguments:
         return Arguments(
             input_file=arguments.input_file,
             input_format=arguments.format,
-            start_date=arguments.start_date
+            start_date=arguments.start_date,
+            user_name=arguments.user_name
         )
 
     @staticmethod
@@ -53,12 +54,16 @@ class Arguments:
             "-sd", "--start-date",
             default="2017-1-1T12:00:00",
             help="Start date used to convert timestamp (i.e., YYYY-MM-DDThh:mm:ss")
+        parser.add_argument(
+            "-u", "--user-name",
+            help="The name of the user that create the file")
         return parser
 
-    def __init__(self, input_file, input_format, start_date):
+    def __init__(self, input_file, input_format, start_date, user_name):
         self._input_file = input_file
         self._input_format = FileFormats.match(input_format)
         self._start_date = self._validate(start_date)
+        self._user_name = user_name
 
     DATE_FORMAT = "%Y-%m-%dT%H:%M:%S"
 
@@ -84,6 +89,14 @@ class Arguments:
     @property
     def start_date(self):
         return self._start_date
+
+    @property
+    def include_user_name(self):
+        return self.user_name is not None
+
+    @property
+    def user_name(self):
+        return self._user_name
 
 
 class Display:
@@ -150,6 +163,8 @@ class CLI:
             arguments = Arguments.read_from(command_line)
             flow = self._read_flow_from(arguments.input_format, arguments.input_file)
             flow.start_date = arguments.start_date
+            if arguments.include_user_name:
+                flow.user_name = arguments.user_name
             self._write_flow_to(flow, FileFormats.HDG, arguments.output_file)
 
         except InvalidDateError as error:

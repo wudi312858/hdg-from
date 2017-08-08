@@ -47,12 +47,14 @@ class Observation:
 
 class Flow:
 
+    DEFAULT_USER_NAME = "Unknown"
     DEFAULT_WATER_BODY = "Unknown"
 
-    def __init__(self, water_body=None, observations=[], start_date=None):
+    def __init__(self, water_body=None, observations=[], start_date=None, user_name=None):
         self._water_body = water_body or self.DEFAULT_WATER_BODY
         self._observations = observations
         self._start_date = start_date or datetime(2017, 1, 1, 12)
+        self._user_name = user_name or self.DEFAULT_USER_NAME
 
     @property
     def water_body(self):
@@ -76,3 +78,11 @@ class Flow:
     @property
     def end_date(self):
         return self._start_date + self._observations[-1].time
+
+    @property
+    def user_name(self):
+        return self._user_name
+
+    @user_name.setter
+    def user_name(self, user_name):
+        self._user_name = user_name
