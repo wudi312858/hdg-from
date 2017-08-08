@@ -16,7 +16,7 @@ __metaclass__ = type
 
 from datetime import datetime, timedelta
 
-from hdgfrom.flow import Flow, Observation, Rate
+from hdgfrom.flow import Flow, Observation, Rate, Unit
 
 
 class FileFormats:
@@ -83,7 +83,10 @@ class SWMMReader(Reader):
     @staticmethod
     def _read_observations_from(input_stream):
         observations = []
-        SWMMReader._skip_lines(input_stream, 2)
+        SWMMReader._skip_lines(input_stream, 1)
+
+        unit = SWMMReader._read_unit(input_stream)
+
         line = input_stream.readline()
         while line.strip() != "":
             (day, time, rate) = line.strip().split("\t")
@@ -93,9 +96,15 @@ class SWMMReader(Reader):
                 hours=int(hour),
                 minutes=int(minute),
                 seconds=int(second))
-            observations.append(Observation(Rate(float(rate.strip())), timestamp))
+            observations.append(Observation(Rate(float(rate.strip()), unit), timestamp))
             line = input_stream.readline()
         return observations
+
+    @staticmethod
+    def _read_unit(input_stream):
+        headers = input_stream.readline()
+        parts = headers.split()
+        return Unit.by_name(parts[-1][1:-1])
 
     @staticmethod
     def _skip_lines(input_stream, count=1):
@@ -132,8 +141,17 @@ class HDGWriter(Writer):
                   "62000,6957300,0,999999999,0,0,0,0,0\n"
                   "1,0,0\n"
                   "1\n"
-                  "2,0,0,1.0,0,0.0,0.0,Flow Rate,Flow Rate\n"
+                  "2,0,{unit_code},1.0,0,0.0,0.0,Flow Rate,Flow Rate\n"
                   "$Year,Month,Day,Hour,Minute,Bin1,Flow Rate\n")
+
+    HDG_UNIT_CODES = {
+        Unit.CMS: 0,
+        Unit.CFS: 1,
+        Unit.MGD: 2,
+        Unit.GPM: 3,
+        Unit.CMD: 4,
+        Unit.CMH: 5
+    }
 
     def __init__(self):
         super().__init__(FileFormats.HDG)
@@ -145,7 +163,8 @@ class HDGWriter(Writer):
             user_name=flow.user_name,
             start_date=flow.start_date.strftime(self.DATE_FORMAT),
             end_date=flow.end_date.strftime(self.DATE_FORMAT),
-            observation_count=len(flow.observations)
+            observation_count=len(flow.observations),
+            unit_code=self._hdg_code_of(flow.unit)
         )
         output_stream.write(header)
         for each_observation in flow.observations:
@@ -158,6 +177,13 @@ class HDGWriter(Writer):
                                                  date.second,
                                                  each_observation.rate.value)
             output_stream.write(line)
+
+    @staticmethod
+    def _hdg_code_of(unit):
+        if unit not in HDGWriter.HDG_UNIT_CODES.keys():
+            raise ValueError("Unit '%s' not supported by the HDG format" % str(unit))
+        return HDGWriter.HDG_UNIT_CODES.get(unit)
+
 
 class AdapterLibrary:
     """

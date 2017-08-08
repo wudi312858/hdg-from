@@ -14,20 +14,74 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from datetime import datetime
 
 
+class Unit:
+
+    def __init__(self, symbol, name, factor_to_cmd):
+        self._symbol = symbol
+        self._name = name
+        self._factor_to_cmd = factor_to_cmd
+
+    @property
+    def symbol(self):
+        return self._symbol
+
+    def to_CMD(self, value):
+        return value * self._factor_to_cmd
+
+    def from_CMD(self, value):
+        return value / self._factor_to_cmd
+
+    def __repr__(self):
+        return self._symbol
+
+
+UNITS = [
+    Unit("CFS", "Cubic feet per second", 2446.575),
+    Unit("CMD", "Cubic meters per day", 1.),
+    Unit("CMH", "Cubic meters per hour", 24),
+    Unit("CMS", "Cubic meters per second", 86400),
+    Unit("GPM", "Gallons per minute", 5.45),
+    Unit("LPS", "liters per second", 86.4),
+    Unit("MGD", "millions of gallon per day", 378.541), 
+    Unit("MLD", "millions of liter per day", 1000)
+]
+
+def unit_by_name(name):
+    for any_unit in UNITS:
+        if any_unit.symbol == name.upper():
+            return any_unit
+    raise ValueError("Unknown unit '%s'" % name)
+
+setattr(Unit, "by_name", unit_by_name)
+
+for each_unit in UNITS:
+    setattr(Unit, each_unit.symbol.upper(), each_unit)
+
+
+
 class Rate:
 
     ERROR_INVALID_RATE = "Rate cannot be negative, but found (value={})"
 
-    def __init__(self, value):
+    def __init__(self, value, unit=None):
         if value < 0:
             message = self.ERROR_INVALID_RATE.format(value)
             raise ValueError(message)
-
         self._value = value
+        self._unit = unit or Unit.LPS
 
     @property
     def value(self):
         return self._value
+
+    @property
+    def unit(self):
+        return self._unit
+
+    def convert_to(self, new_unit):
+        cmd = self._unit.to_CMD(self._value)
+        converted = new_unit.from_CMD(cmd)
+        return Rate(converted, new_unit)
 
 
 class Observation:
@@ -90,3 +144,21 @@ class Flow:
     @user_name.setter
     def user_name(self, user_name):
         self._user_name = user_name
+
+    @property
+    def unit(self):
+        if len(self._observations) == 0:
+            return None
+        return self._observations[0].rate.unit
+
+    def convert_to(self, unit):
+        observations = []
+        for each_observation in self._observations:
+            observations.append(
+                Observation(
+                    each_observation.rate.convert_to(unit),
+                    each_observation.time))
+        return Flow(self.water_body,
+                    observations,
+                    self._start_date,
+                    self._user_name)

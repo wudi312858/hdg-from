@@ -15,7 +15,7 @@ from argparse import ArgumentParser
 from datetime import datetime
 from sys import argv, stdout
 
-from hdgfrom.flow import Flow
+from hdgfrom.flow import Flow, Unit
 from hdgfrom.adapters import FileFormats, AdapterLibrary
 from hdgfrom.errors import InvalidDateError
 
@@ -35,7 +35,8 @@ class Arguments:
             start_date=arguments.start_date,
             user_name=arguments.user_name,
             water_body=arguments.water_body,
-            output_file=arguments.output
+            output_file=arguments.output,
+            unit=arguments.unit
         )
 
     @staticmethod
@@ -63,18 +64,24 @@ class Arguments:
             "-u", "--user-name",
             help="The name of the user that create the file")
         parser.add_argument(
+            "--unit",
+            choices=["CMS", "CFS", "MGD", "GPM", "CMD", "CMH"],
+            default="CMD",
+            help="The flow rate unit to use in the HDG file")
+        parser.add_argument(
             "-w", "--water-body",
             help="The name of the water body")
         return parser
 
     def __init__(self, input_file, input_format, start_date, user_name,
-                 water_body, output_file):
+                 water_body, output_file, unit):
         self._input_file = input_file
         self._input_format = FileFormats.match(input_format)
         self._start_date = self._validate(start_date)
         self._user_name = user_name
         self._water_body = water_body
         self._output_file = output_file
+        self._unit = Unit.by_name(unit)
 
     DATE_FORMAT = "%Y-%m-%dT%H:%M:%S"
 
@@ -118,6 +125,10 @@ class Arguments:
     @property
     def water_body(self):
         return self._water_body
+
+    @property
+    def unit(self):
+        return self._unit
 
 
 class Display:
@@ -183,6 +194,7 @@ class CLI:
         try:
             arguments = Arguments.read_from(command_line)
             flow = self._read_flow_from(arguments.input_format, arguments.input_file)
+            flow = flow.convert_to(arguments.unit)
             self._adjust_metadata(flow, arguments)
             self._write_flow_to(flow, FileFormats.HDG, arguments.output_file)
 

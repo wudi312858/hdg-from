@@ -2,6 +2,7 @@ hdg-from |---| Generate HDG files for GEMSS
 ===========================================
 
 .. image:: https://img.shields.io/pypi/v/hdgfrom.svg
+   :target: https://pypi.python.org/pypi/hdgfrom
 
 "hdg-from" is a simple command-line tool that generates HDG files for
 the Global Environment Modelling System for Subsurface waters
@@ -23,7 +24,7 @@ Below are the options that `hdg-from` accepts:
 -f <format>, --format <format>
 
     The file format of the input file. So far only the SWMM format is
-    available, but other my be supported in later version.
+    available, but other may be supported in later versions.
 
 -o <file>, --output <file>
 
@@ -43,6 +44,19 @@ Below are the options that `hdg-from` accepts:
     The name of the user that creates the HDG file. Should be enclosed
     in double quotes if it contains space. By default, the user name
     is "Unknown".
+
+--unit <unit>
+
+    The flow rate unit, which should be used in the HDG file. By
+    default, HDG files use cubic meter per day (CMD), but the other options
+    are:
+
+     - "CMS" for cubic meters per seconds
+     - "CFS" for cubic feet per seconds
+     - "MGD" for millions of gallon per day
+     - "GPM" for gallons per minutes
+     - "CMD" for cubic meters per day
+     - "CMH" for cubic meters per hour
 
 -w <name>, --water-body <name>
 
@@ -79,6 +93,9 @@ commit on the Git repository, using:
 
 Change Log
 ----------
+:Next version:
+ - Unit conversions from the SWMM file to the HDG file.
+
 :Version 0.2.0:
  - Let the user specify the name of the generated HDG file.
  - Let the user specify its name for inclusion in the HDG file.

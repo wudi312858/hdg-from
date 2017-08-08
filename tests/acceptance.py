@@ -47,11 +47,11 @@ class AcceptanceTests(TestCase):
                   "62000,6957300,0,999999999,0,0,0,0,0\n"
                   "1,0,0\n"
                   "1\n"
-                  "2,0,0,1.0,0,0.0,0.0,Flow Rate,Flow Rate\n"
+                  "2,0,4,1.0,0,0.0,0.0,Flow Rate,Flow Rate\n"
                   "$Year,Month,Day,Hour,Minute,Bin1,Flow Rate\n"
-                  "2017,1,1,12,15,0,0.18\n"
-                  "2017,1,1,12,30,0,2.30\n"
-                  "2017,1,1,12,45,0,2.06\n")
+                  "2017,1,1,12,15,0,15.55\n"
+                  "2017,1,1,12,30,0,198.72\n"
+                  "2017,1,1,12,45,0,177.98\n")
 
     SWMM_FILE = "my_swmm_file.txt"
 
@@ -115,6 +115,35 @@ class AcceptanceTests(TestCase):
         self._verify_output_contains(
             Display.CONVERSION_COMPLETE,
             file=file_name)
+
+    @patch('hdgfrom.adapters.Writer.now', side_effect=fake_now)
+    def test_unit_conversion(self, mock):
+        unit = "CMD"
+        self._cli.run(["--unit", unit, self.SWMM_FILE])
+
+        self._verify_generated_file(
+            "$GLLVHTTVDFile, V5.0\n"
+            "$Creation Date: 01/01/2017 12:00\n"
+            "$Waterbody Name: Node 3\n"
+            "$Created by: Unknown\n"
+            "$Start Date: 01/01/2017 12:00\n"
+            "$End Date: 01/01/2017 12:45\n"
+            "$Number of Data Lines: 3\n"
+            "$X, Y, Station Height, Missing value,Profile Format, ExceFormat, Longitude, Latitude, Anemometer Height\n"
+            "$Number of bins, Depth data type, TVD file type\n"
+            "62000,6957300,0,999999999,0,0,0,0,0\n"
+            "1,0,0\n"
+            "1\n"
+            "2,0,4,1.0,0,0.0,0.0,Flow Rate,Flow Rate\n"
+            "$Year,Month,Day,Hour,Minute,Bin1,Flow Rate\n"
+            "2017,1,1,12,15,0,15.55\n"
+            "2017,1,1,12,30,0,198.72\n"
+            "2017,1,1,12,45,0,177.98\n",
+            self._generated_file)
+
+        self._verify_output_contains(
+            Display.CONVERSION_COMPLETE,
+            file=self._generated_file)
 
     def test_invalid_start_date(self):
         date = "this-is-not-a-valid-date!"

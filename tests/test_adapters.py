@@ -17,19 +17,20 @@ from mock import patch
 from io import StringIO
 from datetime import datetime, timedelta
 
-from hdgfrom.flow import Flow, Observation, Rate
+from hdgfrom.flow import Flow, Observation, Rate, Unit
 from hdgfrom.adapters import SWMMReader, HDGWriter
 
 
 def fake_now():
     return datetime(2017, 1, 1, 12)
 
+
 class SWMMReaderTests(TestCase):
 
     SWMM_TEXT = """
     Table - Node 3
                                 Total Inflow
-    Days      	Hours     	(LPS)
+    Days      	Hours     	(CMD)
     0         	00:15:00  	0.18
     0         	00:30:00  	2.30
     0         	00:45:00  	2.06
@@ -50,6 +51,8 @@ class SWMMReaderTests(TestCase):
                          [o.rate.value for o in flow.observations])
         self.assertEqual([15*60, 30*60, 45*60],
                  [o.time.total_seconds() for o in flow.observations])
+        self.assertEqual([Unit.CMD, Unit.CMD, Unit.CMD],
+                         [o.rate.unit for o in flow.observations])
 
 
 class HDGWriterTest(TestCase):
@@ -59,9 +62,9 @@ class HDGWriterTest(TestCase):
         self._output = StringIO()
         self._flow = Flow(
             "Test Water",
-            [ Observation(Rate(0.10), timedelta(minutes=15)),
-              Observation(Rate(0.20), timedelta(minutes=30)),
-              Observation(Rate(0.30), timedelta(minutes=45)) ],
+            [ Observation(Rate(0.10, Unit.CMD), timedelta(minutes=15)),
+              Observation(Rate(0.20, Unit.CMD), timedelta(minutes=30)),
+              Observation(Rate(0.30, Unit.CMD), timedelta(minutes=45)) ],
             user_name="Bobby"
         )
         self._expected_hdg = ("$GLLVHTTVDFile, V5.0\n"
@@ -76,7 +79,7 @@ class HDGWriterTest(TestCase):
                               "62000,6957300,0,999999999,0,0,0,0,0\n"
                               "1,0,0\n"
                               "1\n"
-                              "2,0,0,1.0,0,0.0,0.0,Flow Rate,Flow Rate\n"
+                              "2,0,4,1.0,0,0.0,0.0,Flow Rate,Flow Rate\n"
                               "$Year,Month,Day,Hour,Minute,Bin1,Flow Rate\n"
                               "2017,1,1,12,15,0,0.10\n"
                               "2017,1,1,12,30,0,0.20\n"
