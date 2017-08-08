@@ -60,6 +60,10 @@ class Flow:
     def water_body(self):
         return self._water_body
 
+    @water_body.setter
+    def water_body(self, water_body):
+        self._water_body = water_body
+
     @property
     def observations(self):
         return self._observations

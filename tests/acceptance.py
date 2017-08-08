@@ -91,6 +91,18 @@ class AcceptanceTests(TestCase):
             Display.CONVERSION_COMPLETE,
             file=self._generated_file)
 
+    @patch('hdgfrom.adapters.Writer.now', side_effect=fake_now)
+    def test_setting_wter_body_name(self, mock):
+        water_body = "Havre de Rotheneuf"
+        self._cli.run(["--water-body", water_body, self.SWMM_FILE])
+
+        self._verify_generated_file(
+            self.HDG_OUTPUT.replace("Node 3", water_body))
+
+        self._verify_output_contains(
+            Display.CONVERSION_COMPLETE,
+            file=self._generated_file)
+
     def test_invalid_start_date(self):
         date = "this-is-not-a-valid-date!"
         self._cli.run(["--start-date", date, self.SWMM_FILE])

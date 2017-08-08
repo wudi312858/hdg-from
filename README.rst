@@ -35,8 +35,15 @@ Below are the options that `hdg-from` accepts:
  -u <name>, --user-name <name>
 
     The name of the user that creates the HDG file. Should be enclosed
-    in double quotes it contains space. By default, the user name is
-    "Unknown".
+    in double quotes if it contains space. By default, the user name
+    is "Unknown".
+
+ -w <name>, --water-body <name>
+
+    The name of the water body to set in the HDG file. This will
+    override the one read in the SWMM file, if any. Should be enclosed
+    in double quotes if it contains spaces. By default, the name of
+    the water body is read from the input file.
 
  -h, --help
 
@@ -68,6 +75,7 @@ Change Log
 ----------
 :Next Version:
  - Let the user specify its name for inclusion in the HDG file
+ - Let the user override the name of the water body
  - Tell the user how many observations were loaded from the input
    file.
  - Catch `FileNotFoundError` properly.
@@ -81,13 +89,6 @@ Change Log
  - Let the user specify the starting date to convert simulated time
    into absolute time.
  - Only tested on Python 3.6.
-
-Next Steps
-----------
-
-- Allow overriding the name of the water body
-- Let the user specify its user name
-- Reports invalid dates
 
 .. |---| unicode:: U+2014
 

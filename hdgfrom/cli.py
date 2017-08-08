@@ -33,7 +33,8 @@ class Arguments:
             input_file=arguments.input_file,
             input_format=arguments.format,
             start_date=arguments.start_date,
-            user_name=arguments.user_name
+            user_name=arguments.user_name,
+            water_body=arguments.water_body
         )
 
     @staticmethod
@@ -57,13 +58,17 @@ class Arguments:
         parser.add_argument(
             "-u", "--user-name",
             help="The name of the user that create the file")
+        parser.add_argument(
+            "-w", "--water-body",
+            help="The name of the water body")
         return parser
 
-    def __init__(self, input_file, input_format, start_date, user_name):
+    def __init__(self, input_file, input_format, start_date, user_name, water_body):
         self._input_file = input_file
         self._input_format = FileFormats.match(input_format)
         self._start_date = self._validate(start_date)
         self._user_name = user_name
+        self._water_body = water_body
 
     DATE_FORMAT = "%Y-%m-%dT%H:%M:%S"
 
@@ -97,6 +102,14 @@ class Arguments:
     @property
     def user_name(self):
         return self._user_name
+
+    @property
+    def include_water_body(self):
+        return self._water_body is not None
+
+    @property
+    def water_body(self):
+        return self._water_body
 
 
 class Display:
@@ -162,9 +175,7 @@ class CLI:
         try:
             arguments = Arguments.read_from(command_line)
             flow = self._read_flow_from(arguments.input_format, arguments.input_file)
-            flow.start_date = arguments.start_date
-            if arguments.include_user_name:
-                flow.user_name = arguments.user_name
+            self._adjust_metadata(flow, arguments)
             self._write_flow_to(flow, FileFormats.HDG, arguments.output_file)
 
         except InvalidDateError as error:
@@ -178,6 +189,13 @@ class CLI:
             flow = self._adapters.read_from(file_format, input_file)
             self._display.input_file_loaded(path, flow)
             return flow
+
+    def _adjust_metadata(self, flow, arguments):
+        flow.start_date = arguments.start_date
+        if arguments.include_user_name:
+            flow.user_name = arguments.user_name
+        if arguments.include_water_body:
+            flow.water_body = arguments.water_body
 
     def _write_flow_to(self, flow, format, path):
         with open(path, "w") as output:
