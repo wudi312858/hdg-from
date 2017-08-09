@@ -8,16 +8,52 @@ hdg-from |---| Generate HDG files for GEMSS
 the Global Environment Modelling System for Subsurface waters
 (GEMSS_).
 
-Example
--------
+Usage Example
+-------------
 
-For instance, if you have data produced by the Storm Water
-Management Model (SWMM_), say in a text file in for instance, you can
-use `hdg-from` to obtain the equivalent HDG file by entering.
+For instance, if you have data produced by the Storm Water Management
+Model (SWMM_), say in a text file ``my-data.txt`` in for instance,
+where the flow rates are in liters per second (LPS), as follows:
+
+.. code-block:: text
+
+    Table - Node 1
+                                Total Inflow
+    Days      	Hours    	(LPS)
+    0         	00:15:00  	0.18
+    0         	00:30:00  	2.30
+    0         	00:45:00  	2.06
+
+You can use `hdg-from` to obtain the equivalent HDG file by entering.
 
 .. code-block:: console
 
     $ hdg-from my-data.txt
+    3 observation(s) loaded from 'my-data.txt'.
+    'my-data.hdg' successfully generated.
+
+In the generated file, named by default ``my-data.hdg``, the flow
+values have been convert to cubic meters per day (CMD).
+
+.. code-block:: text
+
+    $GLLVHTTVDFile, V5.0
+    $Creation Date: 09/08/2017 08:52
+    $Waterbody Name: Node 1
+    $Created by: Unknown
+    $Start Date: 01/01/2017 12:00
+    $End Date: 01/01/2017 12:45
+    $Number of Data Lines: 3
+    $X, Y, Station Height, Missing value,Profile Format, ExceFormat, Longitude, Latitude, Anemometer Height
+    $Number of bins, Depth data type, TVD file type
+    62000,6957300,0,999999999,0,0,0,0,0
+    1,0,0
+    1
+    2,0,4,1.0,0,0.0,0.0,Flow Rate,Flow Rate
+    $Year,Month,Day,Hour,Minute,Bin1,Flow Rate
+    2017,1,1,12,15,0,15.55
+    2017,1,1,12,30,0,198.72
+    2017,1,1,12,45,0,177.98
 
 Below are the options that `hdg-from` accepts:
 
@@ -26,44 +62,45 @@ Below are the options that `hdg-from` accepts:
     The file format of the input file. So far only the SWMM format is
     available, but other may be supported in later versions.
 
+-n <name>, --user-name <name>
+
+    The name of the user that creates the HDG file (see HDG Field
+    ``Created By``). Should be enclosed in double quotes if it
+    contains space. By default, the user name is "Unknown".
+
 -o <file>, --output <file>
 
     The HDG file to generate. By default, the generated file will have
     the same name as the given input file (only its extension will
-    differ).
+    differ), as in the example above.
 
 -s <date>, --start-date <date>
 
     The date used as a starting point to convert simulated time into
-    absolute time. Dates must adhere to the `ISO 8601`_ standard such
-    as 2017-01-01T12:00:00. By default, the date used is Jan. 1, 2017
-    at 12:00 AM.
-
--u <name>, --user-name <name>
-
-    The name of the user that creates the HDG file. Should be enclosed
-    in double quotes if it contains space. By default, the user name
-    is "Unknown".
+    absolute time (see HDG Field ``State Date``). Dates must adhere to
+    the `ISO 8601`_ standard such as 2017-01-01T12:00:00. By default,
+    the date used is Jan. 1, 2017 at 12:00 AM.
 
 --unit <unit>
 
-    The flow rate unit, which should be used in the HDG file. By
-    default, HDG files use cubic meter per day (CMD), but the other options
-    are:
+    The flow rate unit that should be used in the HDG file. By
+    default, HDG files use cubic meter per day (CMD), but the other
+    options are:
 
-     - "CMS" for cubic meters per seconds
-     - "CFS" for cubic feet per seconds
-     - "MGD" for millions of gallon per day
-     - "GPM" for gallons per minutes
-     - "CMD" for cubic meters per day
-     - "CMH" for cubic meters per hour
+    - "CMS" for cubic meters per seconds
+    - "CFS" for cubic feet per seconds
+    - "MGD" for millions of gallon per day
+    - "GPM" for gallons per minutes
+    - "CMD" for cubic meters per day
+    - "CMH" for cubic meters per hour
 
 -w <name>, --water-body <name>
 
-    The name of the water body to set in the HDG file. This will
-    override the one read in the SWMM file, if any. Should be enclosed
-    in double quotes if it contains spaces. By default, the name of
-    the water body is read from the input file.
+    The name of the water body to set in the HDG file (see Field
+    ``Waterbody Name``). This will override the one read in the SWMM
+    file, if any. Should be enclosed in double quotes if it contains
+    spaces. By default, the name of the water body is read from the
+    input file.
 
 -h, --help
 

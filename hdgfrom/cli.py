@@ -61,10 +61,10 @@ class Arguments:
             default="2017-1-1T12:00:00",
             help="Start date used to convert timestamp (i.e., YYYY-MM-DDThh:mm:ss")
         parser.add_argument(
-            "-u", "--user-name",
+            "-n", "--user-name",
             help="The name of the user that create the file")
         parser.add_argument(
-            "--unit",
+            "-u", "--unit",
             choices=["CMS", "CFS", "MGD", "GPM", "CMD", "CMH"],
             default="CMD",
             help="The flow rate unit to use in the HDG file")

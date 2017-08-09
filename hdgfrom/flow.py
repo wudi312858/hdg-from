@@ -25,6 +25,9 @@ class Unit:
     def symbol(self):
         return self._symbol
 
+    def match_symbol(self, symbol):
+        return symbol.strip().upper() == self._symbol
+
     def to_CMD(self, value):
         return value * self._factor_to_cmd
 
@@ -36,27 +39,26 @@ class Unit:
 
 
 UNITS = [
-    Unit("CFS", "Cubic feet per second", 2446.575),
-    Unit("CMD", "Cubic meters per day", 1.),
-    Unit("CMH", "Cubic meters per hour", 24),
-    Unit("CMS", "Cubic meters per second", 86400),
-    Unit("GPM", "Gallons per minute", 5.45),
+    Unit("CFS", "cubic feet per second", 2446.575),
+    Unit("CMD", "cubic meters per day", 1.),
+    Unit("CMH", "cubic meters per hour", 24),
+    Unit("CMS", "cubic meters per second", 86400),
+    Unit("GPM", "gallons per minute", 5.45),
     Unit("LPS", "liters per second", 86.4),
-    Unit("MGD", "millions of gallon per day", 378.541), 
+    Unit("MGD", "millions of gallon per day", 378.541),
     Unit("MLD", "millions of liter per day", 1000)
 ]
 
-def unit_by_name(name):
+def unit_by_name(symbol):
     for any_unit in UNITS:
-        if any_unit.symbol == name.upper():
+        if any_unit.match_symbol(symbol):
             return any_unit
     raise ValueError("Unknown unit '%s'" % name)
 
-setattr(Unit, "by_name", unit_by_name)
+setattr(Unit, "by_name", staticmethod(unit_by_name))
 
 for each_unit in UNITS:
     setattr(Unit, each_unit.symbol.upper(), each_unit)
-
 
 
 class Rate:
