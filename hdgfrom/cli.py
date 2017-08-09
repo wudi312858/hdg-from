@@ -141,7 +141,12 @@ class Display:
     )
 
     CONVERSION_COMPLETE = (
-        "'{file}' successfully generated.\n"
+        "File '{file}' successfully generated.\n"
+    )
+
+    WARNING_ALL_ZERO_FLOW = (
+        "WARNING: The conversion to '{unit}' leads to only near-zero values\n"
+        "         You may need a different unit.\n"
     )
 
     ERROR_INPUT_FILE_NOT_FOUND = (
@@ -166,6 +171,10 @@ class Display:
         self._display(self.CONVERSION_COMPLETE,
                       file=path)
 
+    def warn_about_only_zeros(self, unit):
+        self._display(self.WARNING_ALL_ZERO_FLOW,
+                      unit=unit.symbol)
+
     def error_input_file_not_found(self, arguments, error):
         self._display(self.ERROR_INPUT_FILE_NOT_FOUND,
                       file=arguments.input_file,
@@ -186,6 +195,7 @@ class CLI:
     and write the same flow down as an HDG file.
     """
 
+
     def __init__(self, adapters=None, output=None):
         self._adapters = adapters or AdapterLibrary()
         self._display = Display(output)
@@ -194,7 +204,7 @@ class CLI:
         try:
             arguments = Arguments.read_from(command_line)
             flow = self._read_flow_from(arguments.input_format, arguments.input_file)
-            flow = flow.convert_to(arguments.unit)
+            flow = self._convert_to_unit(flow, arguments.unit)
             self._adjust_metadata(flow, arguments)
             self._write_flow_to(flow, FileFormats.HDG, arguments.output_file)
 
@@ -209,6 +219,12 @@ class CLI:
             flow = self._adapters.read_from(file_format, input_file)
             self._display.input_file_loaded(path, flow)
             return flow
+
+    def _convert_to_unit(self, flow, unit):
+        new_flow = flow.convert_to(unit)
+        if new_flow.contains_only_values_smaller_than(1e-2):
+            self._display.warn_about_only_zeros(new_flow.unit)
+        return new_flow
 
     def _adjust_metadata(self, flow, arguments):
         flow.start_date = arguments.start_date

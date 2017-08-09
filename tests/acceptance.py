@@ -145,6 +145,14 @@ class AcceptanceTests(TestCase):
             Display.CONVERSION_COMPLETE,
             file=self._generated_file)
 
+    @patch('hdgfrom.adapters.Writer.now', side_effect=fake_now)
+    def test_detecting_all_zero_flows(self, mock):
+        self._cli.run(["--unit", "CMS", self.SWMM_FILE])
+
+        self._verify_output_contains(
+            Display.WARNING_ALL_ZERO_FLOW.format(unit="CMS"))
+
+        
     def test_invalid_start_date(self):
         date = "this-is-not-a-valid-date!"
         self._cli.run(["--start-date", date, self.SWMM_FILE])

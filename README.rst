@@ -132,6 +132,7 @@ Change Log
 ----------
 :Next version:
  - Unit conversions from the SWMM file to the HDG file.
+ - Warn about conversions that lead to only zero values.
 
 :Version 0.2.0:
  - Let the user specify the name of the generated HDG file.

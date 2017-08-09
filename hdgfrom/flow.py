@@ -164,3 +164,6 @@ class Flow:
                     observations,
                     self._start_date,
                     self._user_name)
+
+    def contains_only_values_smaller_than(self, threshold):
+        return all(o.rate.value < threshold for o in self._observations)
