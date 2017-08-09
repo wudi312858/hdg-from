@@ -130,7 +130,7 @@ commit on the Git repository, using:
 
 Change Log
 ----------
-:Next version:
+:Version 0.3.0:
  - Unit conversions from the SWMM file to the HDG file.
  - Warn about conversions that lead to only zero values.
 
